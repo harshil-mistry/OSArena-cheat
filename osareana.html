@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Scheduling Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #9108d6;
+            --primary-light: #ae3ee3;
+            --primary-dark: #6b05a0;
+            --secondary: #301C4B;
+            --dark: #1c1033;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, rgba(28, 16, 51, 0.9) 0%, rgba(107, 5, 160, 0.8) 100%);
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(145, 8, 214, 0.1) 0%, transparent 60%);
+            z-index: -1;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 1rem auto 0;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--light);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(145, 8, 214, 0.3);
+        }
+
+        select option {
+            background-color: var(--dark);
+            color: var(--white);
+        }
+
+        .process-inputs {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .process-inputs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .process-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .process-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-light);
+        }
+
+        .process-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .process-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .process-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .process-inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(145, 8, 214, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .results-section {
+            margin-top: 3rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        tr {
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            margin: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .gantt-chart {
+            margin: 3rem 0;
+            overflow-x: auto;
+        }
+
+        .gantt-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .gantt-container {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .gantt-row {
+            display: flex;
+            min-height: 50px;
+            align-items: stretch;
+            margin-bottom: 0.5rem;
+        }
+
+        .gantt-block {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            color: var(--white);
+            font-weight: 600;
+            border-radius: 6px;
+            margin: 0 2px;
+            min-width: 40px;
+            position: relative;
+        }
+
+        .gantt-times {
+            display: flex;
+            align-items: center;
+        }
+
+        .gantt-time {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+            padding: 0.3rem 0;
+            min-width: 40px;
+            margin: 0 2px;
+            position: relative;
+        }
+
+        .gantt-time::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 5px;
+            background: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .process-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                flex-direction: column;
+            }
+
+            .stat-card {
+                margin: 0.5rem 0;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fadeIn {
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        /* Custom colors for processes in Gantt chart */
+        .process-colors {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="container fadeIn">
+            <div class="title-section">
+                <h1>Job Scheduling Calculator</h1>
+                <p class="subtitle">Simulate and visualize different CPU scheduling algorithms to understand their performance characteristics</p>
+            </div>
+            
+            <div class="form-section">
+                <div class="input-group">
+                    <label for="algorithm"><i class="fas fa-cog"></i> Select Algorithm:</label>
+                    <select id="algorithm">
+                        <option value="">Select an algorithm</option>
+                        <option value="fcfs">First Come First Serve (FCFS)</option>
+                        <option value="sjf">Shortest Job First (SJF)</option>
+                        <option value="srtf">Shortest Remaining Time First (SRTF)</option>
+                        <option value="lrtf">Longest Remaining Time First (LRTF)</option>
+                        <option value="rr">Round Robin (RR)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="numProcesses"><i class="fas fa-microchip"></i> Number of Processes:</label>
+                    <input type="number" id="numProcesses" min="1" disabled>
+                </div>
+            </div>
+
+            <div class="input-group" id="quantum-group" style="display: none;">
+                <label for="quantum"><i class="fas fa-clock"></i> Time Quantum (for RR):</label>
+                <input type="number" id="quantum" min="1">
+            </div>
+
+            <div id="processInputs" class="process-inputs" style="display: none;"></div>
+            
+            <div class="btn-container">
+                <button id="calculate" class="btn btn-primary" disabled>
+                    <i class="fas fa-calculator"></i> Calculate
+                </button>
+            </div>
+            
+            <div id="results" class="results-section"></div>
+        </div>
+    </div>
+
+    <!-- To generate random colors for Gantt chart -->
+    <div class="process-colors"></div>
+
+    <script>
+        const algorithmSelect = document.getElementById('algorithm');
+        const numProcessesInput = document.getElementById('numProcesses');
+        const processInputs = document.getElementById('processInputs');
+        const calculateBtn = document.getElementById('calculate');
+        const results = document.getElementById('results');
+        const quantumGroup = document.getElementById('quantum-group');
+        const quantumInput = document.getElementById('quantum');
+        const processColors = {};
+
+        // Generate a unique color for each process
+        function getProcessColor(processName) {
+            if (!processColors[processName]) {
+                const hue = Math.floor(Math.random() * 360);
+                processColors[processName] = `hsl(${hue}, 70%, 60%)`;
+            }
+            return processColors[processName];
+        }
+
+        algorithmSelect.addEventListener('change', function() {
+            numProcessesInput.disabled = !this.value;
+            processInputs.innerHTML = '';
+            processInputs.style.display = 'none';
+            results.innerHTML = '';
+            quantumGroup.style.display = this.value === 'rr' ? 'block' : 'none';
+        });
+
+        numProcessesInput.addEventListener('change', function() {
+            const num = parseInt(this.value);
+            if (num > 0) {
+                generateProcessInputs(num);
+                calculateBtn.disabled = false;
+            }
+        });
+
+        function generateProcessInputs(num) {
+            processInputs.innerHTML = '';
+            processInputs.style.display = 'grid';
+            
+            for (let i = 0; i < num; i++) {
+                const processName = `P${i + 1}`;
+                const div = document.createElement('div');
+                div.className = 'process-card';
+                div.innerHTML = `
+                    <div class="process-header">
+                        <div class="process-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <h3 class="process-title">${processName}</h3>
+                    </div>
+                    <div class="process-inputs-grid">
+                        <div class="input-group">
+                            <label for="arrival-${i}"><i class="fas fa-hourglass-start"></i> Arrival Time:</label>
+                            <input type="number" id="arrival-${i}" class="arrival" min="0" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="burst-${i}"><i class="fas fa-hourglass"></i> Burst Time:</label>
+                            <input type="number" id="burst-${i}" class="burst" min="1" required>
+                        </div>
+                    </div>
+                `;
+                processInputs.appendChild(div);
+            }
+        }
+
+        calculateBtn.addEventListener('click', calculateSchedule);
+
+        function calculateSchedule() {
+            const algorithm = algorithmSelect.value;
+            const processes = Array.from(processInputs.children).map((div, i) => ({
+                name: `P${i + 1}`,
+                arrival: parseInt(div.querySelector('.arrival').value),
+                burst: parseInt(div.querySelector('.burst').value),
+                remaining: parseInt(div.querySelector('.burst').value)
+            }));
+
+            let result, gantt;
+            switch(algorithm) {
+                case 'fcfs': [result, gantt] = calculateFCFS(processes); break;
+                case 'sjf': [result, gantt] = calculateSJF(processes); break;
+                case 'srtf': [result, gantt] = calculateSRTF(processes); break;
+                case 'lrtf': [result, gantt] = calculateLRTF(processes); break;
+                case 'rr': [result, gantt] = calculateRR(processes, parseInt(quantumInput.value)); break;
+            }
+
+            displayResults(result, gantt, algorithm);
+        }
+
+        function calculateFCFS(processes) {
+            const sorted = [...processes].sort((a, b) => a.arrival - b.arrival);
+            let currentTime = 0;
+            const gantt = [];
+            sorted.forEach(p => {
+                if (currentTime < p.arrival) currentTime = p.arrival;
+                gantt.push({ process: p.name, start: currentTime, end: currentTime + p.burst });
+                currentTime += p.burst;
+                p.completion = currentTime;
+                p.turnaround = p.completion - p.arrival;
+                p.waiting = p.turnaround - p.burst;
+            });
+            return [processes, gantt];
+        }
+
+        function calculateSJF(processes) {
+            const sorted = [...processes];
+            let currentTime = 0;
+            const completed = [];
+            const gantt = [];
+            while (completed.length < processes.length) {
+                const available = sorted.filter(p => p.arrival <= currentTime && !completed.includes(p));
+                if (available.length === 0) {
+                    currentTime++;
+                    continue;
+                }
+                const shortest = available.reduce((min, p) => p.burst < min.burst ? p : min);
+                gantt.push({ process: shortest.name, start: currentTime, end: currentTime + shortest.burst });
+                currentTime += shortest.burst;
+                shortest.completion = currentTime;
+                shortest.turnaround = shortest.completion - shortest.arrival;
+                shortest.waiting = shortest.turnaround - shortest.burst;
+                completed.push(shortest);
+            }
+            return [processes, gantt];
+        }
+
+        function calculateSRTF(processes) {
+            let currentTime = 0;
+            const completed = [];
+            const gantt = [];
+            let currentProcess = null;
+            
+            while (completed.length < processes.length) {
+                const available = processes.filter(p => p.arrival <= currentTime && !completed.includes(p));
+                
+                if (available.length === 0) {
+                    currentTime++;
+                    continue;
+                }
+
+                // Find process with shortest remaining time
+                const shortest = available.reduce((min, p) => p.remaining < min.remaining ? p : min);
+
+                // Only switch if new process has strictly less remaining time than current
+                if (currentProcess === null || shortest.remaining < currentProcess.remaining) {
+                    if (currentProcess && currentProcess !== shortest) {
+                        gantt[gantt.length - 1].end = currentTime;
+                    }
+                    if (currentProcess !== shortest) {
+                        gantt.push({ process: shortest.name, start: currentTime });
+                    }
+                    currentProcess = shortest;
+                }
+
+                // Execute current process for one time unit
+                currentProcess.remaining--;
+                currentTime++;
+
+                if (currentProcess.remaining === 0) {
+                    gantt[gantt.length - 1].end = currentTime;
+                    currentProcess.completion = currentTime;
+                    currentProcess.turnaround = currentProcess.completion - currentProcess.arrival;
+                    currentProcess.waiting = currentProcess.turnaround - currentProcess.burst;
+                    completed.push(currentProcess);
+                    currentProcess = null;
+                }
+            }
+
+            return [processes, gantt];
+        }
+
+        function calculateLRTF(processes) {
+            let currentTime = 0;
+            const completed = [];
+            const gantt = [];
+            let lastProcess = null;
+            while (completed.length < processes.length) {
+                const available = processes.filter(p => p.arrival <= currentTime && !completed.includes(p));
+                if (available.length === 0) {
+                    currentTime++;
+                    continue;
+                }
+                const longest = available.reduce((max, p) => p.remaining > max.remaining ? p : max);
+                if (lastProcess !== longest.name) {
+                    if (lastProcess) gantt[gantt.length - 1].end = currentTime;
+                    gantt.push({ process: longest.name, start: currentTime });
+                    lastProcess = longest.name;
+                }
+                longest.remaining--;
+                currentTime++;
+                if (longest.remaining === 0) {
+                    gantt[gantt.length - 1].end = currentTime;
+                    longest.completion = currentTime;
+                    longest.turnaround = longest.completion - longest.arrival;
+                    longest.waiting = longest.turnaround - longest.burst;
+                    completed.push(longest);
+                    lastProcess = null;
+                }
+            }
+            return [processes, gantt];
+        }
+
+        function calculateRR(processes, quantum) {
+            const gantt = [];
+            let currentTime = Math.min(...processes.map(p => p.arrival));
+            const readyQueue = [];
+            const completed = new Set();
+            
+            processes.forEach(p => {
+                if (p.arrival <= currentTime && p.remaining > 0) {
+                    readyQueue.push(p);
+                }
+            });
+
+            while (readyQueue.length > 0 || completed.size < processes.length) {
+                if (readyQueue.length === 0) {
+                    const remainingProcesses = processes.filter(p => !completed.has(p));
+                    if (remainingProcesses.length > 0) {
+                        currentTime = Math.min(...remainingProcesses.map(p => p.arrival));
+                        remainingProcesses.forEach(p => {
+                            if (p.arrival <= currentTime && !completed.has(p)) {
+                                readyQueue.push(p);
+                            }
+                        });
+                    }
+                    continue;
+                }
+
+                const process = readyQueue.shift();
+                const startTime = Math.max(currentTime, process.arrival);
+                const timeSlice = Math.min(quantum, process.remaining);
+                const endTime = startTime + timeSlice;
+
+                gantt.push({ process: process.name, start: startTime, end: endTime });
+                process.remaining -= timeSlice;
+                currentTime = endTime;
+
+                const newlyArrived = processes.filter(p => 
+                    p.arrival <= currentTime && 
+                    p.arrival > startTime && 
+                    !readyQueue.includes(p) && 
+                    !completed.has(p) && 
+                    p.remaining > 0
+                );
+
+                newlyArrived.sort((a, b) => a.arrival - b.arrival);
+                readyQueue.push(...newlyArrived);
+
+                if (process.remaining > 0) {
+                    readyQueue.push(process);
+                } else {
+                    process.completion = currentTime;
+                    process.turnaround = process.completion - process.arrival;
+                    process.waiting = process.turnaround - process.burst;
+                    completed.add(process);
+                }
+            }
+
+            return [processes, gantt];
+        }
+
+        function displayResults(processes, gantt, algorithm) {
+            const avgWaiting = processes.reduce((sum, p) => sum + p.waiting, 0) / processes.length;
+            const avgTurnaround = processes.reduce((sum, p) => sum + p.turnaround, 0) / processes.length;
+            
+            // Get algorithm full name
+            const algorithmNames = {
+                'fcfs': 'First Come First Serve (FCFS)',
+                'sjf': 'Shortest Job First (SJF)',
+                'srtf': 'Shortest Remaining Time First (SRTF)',
+                'lrtf': 'Longest Remaining Time First (LRTF)',
+                'rr': 'Round Robin (RR)'
+            };
+
+            results.innerHTML = `
+                <div class="results-section fadeIn">
+                    <h2 class="gantt-title">${algorithmNames[algorithm]} Results</h2>
+                    
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-title">Average Waiting Time</div>
+                            <div class="stat-value">${avgWaiting.toFixed(2)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Average Turnaround Time</div>
+                            <div class="stat-value">${avgTurnaround.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                            <th>Completion Time</th>
+                            <th>Turnaround Time</th>
+                            <th>Waiting Time</th>
+                        </tr>
+                        ${processes.map(p => `
+                            <tr>
+                                <td><strong>${p.name}</strong></td>
+                                <td>${p.arrival}</td>
+                                <td>${p.burst}</td>
+                                <td>${p.completion}</td>
+                                <td>${p.turnaround}</td>
+                                <td>${p.waiting}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                    
+                    <div class="gantt-chart">
+                        <h3 class="gantt-title">Gantt Chart Visualization</h3>
+                        <div class="gantt-container">
+                            <div class="gantt-row">
+                                ${gantt.map(block => `
+                                    <div class="gantt-block" 
+                                         style="flex: ${block.end - block.start}; background-color: ${getProcessColor(block.process)};">
+                                        ${block.process}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="gantt-times">
+                                ${gantt.map(block => `
+                                    <div class="gantt-time" style="flex: ${block.end - block.start};">
+                                        ${block.start}${block.end !== block.start ? `-${block.end}` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
